@@ -5,7 +5,7 @@ import path from 'path'
 import { glob, hasMagic } from 'glob'
 import fs from 'fs';
 
-interface ParseConfig {
+export interface ParseConfig {
     filename: string;
     onError: (error: Error) => void;
     catchErrors: boolean;

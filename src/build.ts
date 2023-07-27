@@ -1,8 +1,16 @@
+import path, { dirname, isAbsolute, join } from "path";
 import { isWhitespace } from "./lexer";
 import { Payload, Stmt } from "./parser";
+import { access, mkdir, writeFile } from "fs/promises";
 
-const EXTERNAL_BUILDERS = {};
-
+const EXTERNAL_BUILDERS: Record<string, (
+    stmt: Stmt,
+    padding: string,
+    indent: number,
+    tabs: boolean,
+) => string> = {};
+const DELIMITERS = ['{', '}', ':'];
+const ESCAPE_SEQUENCES_RE = /(\\x[0-91-f]{2}\\[0-7{1,3}])/;
 
 export class Builder {
     padding: string;
@@ -31,12 +39,41 @@ export class Builder {
         return this.head + this.body
     }
 
+    async buildFiles(payload: Payload, targetDirName?: string) {
+        const dirName = targetDirName ?? process.cwd();
+
+        for (const config of payload.config) {
+            let configPath = config.file
+
+            if (!isAbsolute(configPath)) {
+                configPath = join(dirName, configPath)
+            }
+
+            const dirPath = dirname(configPath);
+
+            try {
+                await access(dirPath)
+            }
+            catch (e) {
+                await mkdir(dirPath, { recursive: true })
+            }
+
+
+            const parsed = config.parsed
+            let output = this.build(parsed);
+            output = output.trimEnd() + '\n';
+
+            await writeFile(configPath, output, { encoding: 'utf-8' })
+
+        }
+    }
+
     buildBlock(output: string, block: Iterable<Stmt>, depth: number, lastLine: number) {
         let margin = this.padding.repeat(depth);
 
         for (const stmt of block) {
             const directive = this.enQuote(stmt.directive);
-            
+
             let line = stmt.line ?? 0;
             let build = '';
             if (directive === '#' && line === lastLine) {
@@ -45,9 +82,8 @@ export class Builder {
             } else if (directive === '#') {
                 build = '#' + stmt['comment']
             } else if (directive in EXTERNAL_BUILDERS) {
-                //TODO: support this
-                // let externalBuilder = EXTERNAL_BUILDERS[directive]
-                // build = externalBuilder(stmt,padding,indent,tabs);
+                let externalBuilder = EXTERNAL_BUILDERS[directive]
+                build = externalBuilder(stmt, this.padding, this.indent, this.tabs);
             } else {
                 let args = stmt.args.map(arg => this.enQuote(arg));
                 if (directive === 'if') {
@@ -62,7 +98,7 @@ export class Builder {
                     build += ';'
                 } else {
                     build += ' {'
-                    build = this.buildBlock(build, stmt.block, depth + 1, line)
+                    build = this.buildBlock(build, stmt.block[Symbol.iterator](), depth + 1, line)
                     build += '\n' + margin + '}'
                 }
             }
@@ -131,4 +167,8 @@ export class Builder {
         return result
     }
 
+}
+
+function registerExternalBuilder(name: string, builder: (stmt: Stmt, padding: string, indent: number, tabs: boolean) => string) {
+    EXTERNAL_BUILDERS[name] = builder;
 }

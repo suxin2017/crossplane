@@ -383,7 +383,39 @@ describe('parser module', () => {
             catchErrors: false,
         });
         const payload = await parser.parse();
-        expect(payload).toMatchSnapshot()
+        expect(payload).toEqual({
+            'status': 'ok',
+            'errors': [],
+            'config': [
+                {
+                    'file': join(config, 'nginx.conf'),
+                    'status': 'ok',
+                    'errors': [],
+                    'parsed': [
+                        {
+                            'directive': 'events',
+                            'line': 1,
+                            'args': [],
+                            'block': []
+                        },
+                        {
+                            'directive': 'http',
+                            'line': 2,
+                            'args': [],
+                            'block': [
+                                {
+                                    'directive': 'include',
+                                    'line': 3,
+                                    'args': ['conf.d/server.conf']
+                                    // # no 'includes' key
+                                }
+                            ]
+                        }
+                    ]
+                }
+                // # single config parsed
+            ]
+        })
     });
 
     test('ignore directives', async () => {
