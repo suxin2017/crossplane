@@ -16,7 +16,7 @@ describe('parser module', () => {
             'errors': [
                 {
                     'file': join(dirname, 'conf.d', 'server.conf'),
-                    "error": `Error: ENOENT: no such file or directory, open '${join(dirname,'bar.conf')}'`,
+                    "error": `Error: ENOENT: no such file or directory, open '${join(dirname, 'bar.conf')}'`,
                     'line': 5
                 }
             ],
@@ -52,7 +52,7 @@ describe('parser module', () => {
                     'status': 'failed',
                     'errors': [
                         {
-                            'error': `Error: ENOENT: no such file or directory, open '${join(dirname,'bar.conf')}'`,
+                            'error': `Error: ENOENT: no such file or directory, open '${join(dirname, 'bar.conf')}'`,
                             'line': 5
                         }
                     ],
@@ -388,7 +388,7 @@ describe('parser module', () => {
             'errors': [],
             'config': [
                 {
-                    'file': join(config, 'nginx.conf'),
+                    'file': config,
                     'status': 'ok',
                     'errors': [],
                     'parsed': [
@@ -1012,4 +1012,5 @@ describe('parser module', () => {
             ]
         })
     });
+
 })

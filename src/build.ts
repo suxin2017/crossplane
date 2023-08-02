@@ -21,8 +21,6 @@ export class Builder {
         public indent: number = 4,
         public tabs: boolean = false,
         public header: boolean = false,) {
-        console.log('Builder constructor');
-
         this.padding = tabs ? '\t' : ' '.repeat(indent);
         this.head = ''
         if (header) {
@@ -87,7 +85,7 @@ export class Builder {
             } else {
                 let args = stmt.args.map(arg => this.enQuote(arg));
                 if (directive === 'if') {
-                    build = 'if {' + args.join(' ') + ')'
+                    build = 'if (' + args.join(' ') + ')'
                 } else if (args.length) {
                     build = directive + ' ' + args.join(' ')
                 } else {
@@ -114,7 +112,8 @@ export class Builder {
 
             return directive
         }
-        return JSON.stringify(directive).replace('\\\\', '\\')
+        
+        return JSON.stringify(directive).replace(/\\\\/g, '\\')
     }
     needsQuotes(str: string) {
         if (str === '') {
@@ -123,8 +122,7 @@ export class Builder {
 
         const chars = this.escape(str);
         let index = 0;
-        let char = chars[++index];
-
+        let char = chars[index++];
         if (char && (isWhitespace(char) || ['{', '}', ';', '"', "'", '${'].includes(char))) {
             return true
         }
@@ -156,8 +154,7 @@ export class Builder {
                 result.push(prev);
             }
             if (!['\\', '$'].includes(char)) {
-
-                result.push(prev);
+                result.push(char);
             }
             prev = char;
         }

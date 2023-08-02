@@ -4,7 +4,6 @@ import { Stmt } from "../src/parser";
 import { compareParsedAndBuilt } from "./utils";
 import { join } from "path";
 const tmpdir = (scope?: string) => join(__dirname, 'tmpdir', scope ?? '')
-// TODO: some case is error
 
 describe('build module', () => {
     it('build nested and multiple arg', async () => {

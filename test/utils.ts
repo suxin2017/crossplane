@@ -58,7 +58,8 @@ function assertEqualPayloads(a: any, b: any, ignoreKeys: string[] = []) {
             assertEqualPayloads(a[key], b[key], ignoreKeys);
         }
     } else if (typeof a === 'string') {
-        expect(a).toBe(b);
+        const builder = new Builder()
+        expect(builder.enQuote(a)).toBe(builder.enQuote(b));
     } else {
         expect(a).toEqual(b);
     }

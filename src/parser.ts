@@ -285,11 +285,8 @@ export class Parser {
             } catch (e) {
                 if (this.config.catchErrors) {
                     this.handleError(parsing, e);
-                    console.log(`===${e.strerror}===${e.strerror.endsWith('is not terminated by ";"')}`);
-                    
                     if ((e as NgxParserBaseException)?.strerror?.endsWith('is not terminated by ";"')) {
                         console.log('trying to recover');
-                        
                         if (token != '}' && !quoted) {
                             this._parse(parsing, tokens, undefined, true);
                         } else {
@@ -364,11 +361,12 @@ export class Parser {
 
         if (args && args[0]?.startsWith('(') && args[args.length - 1]?.endsWith(')')) {
             args[0] = args[0].slice(1).trimStart();
-            args[args.length - 1] = args[args.length - 1].substring(0, args.length - 1).trimEnd();
-            let start = args[0] ? 0 : 1;
-            let endArgs = args[args.length - 1] ? 0 : 1;
-            let end = args.length - endArgs;
-            args = args.slice(start, end);
+            args[args.length - 1] = args[args.length - 1].substring(0, (args[args.length - 1]).length - 1).trimEnd();
+            let start = !!args[0] ? 0 : 1;
+
+            let endArgs = !!args[args.length - 1] ? 0 : 1;
+            let end = args.length  - endArgs;
+            stmt.args = args.slice(start, end);
         }
     }
 
