@@ -78,7 +78,6 @@ export class Parser {
 
     constructor(config: Partial<ParseConfig>) {
         this.config = { ...defaultParseConfig, ...config } as unknown as ParseConfig;
-        console.log("Parser created");
         this.includes = [[this.config.filename, []]];
         this.included = { [this.config.filename]: 0 };
         this.configDir = path.dirname(this.config.filename);
@@ -286,7 +285,7 @@ export class Parser {
                 if (this.config.catchErrors) {
                     this.handleError(parsing, e);
                     if ((e as NgxParserBaseException)?.strerror?.endsWith('is not terminated by ";"')) {
-                        console.log('trying to recover');
+                        // console.log('trying to recover');
                         if (token != '}' && !quoted) {
                             this._parse(parsing, tokens, undefined, true);
                         } else {

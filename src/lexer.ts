@@ -4,10 +4,11 @@ type TokenWord = string;
 type Line = number;
 type Quoted = boolean;
 export type Token = [TokenWord, Line, Quoted?]
-type InputIterResult = [string, number];
+export type InputIterResult = [string, number];
 
 const EXTERNAL_LEXERS: any = {};
-export function isWhitespace(char: string) {
+export function isWhitespace(char?: string) {
+    if (char == null) return true;
     return char.trim() === '';
 }
 export class Input {
@@ -62,7 +63,7 @@ export class Lexer {
                 if (token) {
                     yield [token, token_line];
                     if (nextTokenIsDirective && Object.keys(EXTERNAL_LEXERS).includes(token)) {
-                        for (let customLexerToken of EXTERNAL_LEXERS[token]?.(nextInputGenerator, token)) {
+                        for (let customLexerToken of EXTERNAL_LEXERS[token]?.(inputIter, token)) {
                             yield customLexerToken;
                             nextTokenIsDirective = true;
                         }
@@ -184,8 +185,8 @@ export class Lexer {
 }
 
 
-function registerExternalLexer(directive: string[], lexer: (input: Generator<InputIterResult>, token: string) => Generator<Token>) {
-    for (let dir of directive) {
+export function registerExternalLexer(directive: Record<string, []>, lexer: (input: Generator<InputIterResult>, token: string) => Generator<Token>) {
+    for (let dir in directive) {
         EXTERNAL_LEXERS[dir] = lexer;
     }
 }

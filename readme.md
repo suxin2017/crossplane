@@ -1,10 +1,13 @@
-## 介绍
+## Introduce
 
-crossplane 是一个解析校验生成 nginx config 的工具，官方使用 python 实现，这里使用 nodejs 实现
+An unofficial nodejs port of the NGINX config/JSON converter crossplane.
 
-## 任务
+## TODO
 
 - [x] lexer
 - [x] parser
 - [x] analyzer
-- [ ] build
+- [x] build
+- [ ] ext
+
+

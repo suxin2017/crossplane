@@ -112,7 +112,7 @@ export class Builder {
 
             return directive
         }
-        
+
         return JSON.stringify(directive).replace(/\\\\/g, '\\')
     }
     needsQuotes(str: string) {
@@ -166,6 +166,8 @@ export class Builder {
 
 }
 
-function registerExternalBuilder(name: string, builder: (stmt: Stmt, padding: string, indent: number, tabs: boolean) => string) {
-    EXTERNAL_BUILDERS[name] = builder;
+export function registerExternalBuilder(directives: Record<string, any[]>, builder: (stmt: Stmt, padding: string, indent: number, tabs: boolean) => string) {
+    for (const directive in directives) {
+        EXTERNAL_BUILDERS[directive] = builder;
+    }
 }
